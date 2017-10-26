@@ -31,6 +31,8 @@ for obj in json.loads(lines):
         id = 0
         while os.path.exists(dst_file):
             dst_file = os.path.join(destination_dir, dst_name.replace("-", "- {}".format(id)))
+            id += 1
+
         print('Renaming {} to {}'.format(src_file, dst_file))
         os.rename(src_file, dst_file)
 
