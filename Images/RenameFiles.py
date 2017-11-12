@@ -3,7 +3,7 @@ import os, time, stat, json, subprocess
 from datetime import datetime
 
 cur_dir = os.getcwd()
-extensions = [ "jpg", "jpeg", "mov", "mp4", "heic" ]
+extensions = [ "jpg", "jpeg", "mov", "mp4", "m4v", "heic" ]
 destination_dir = os.path.join(cur_dir, "Renamed")
 if not os.path.exists(destination_dir):
     os.makedirs(destination_dir)
