@@ -1,9 +1,13 @@
 #!/usr/local/bin/python3
-import os, time, stat, json, subprocess
+import os, time, stat, json, subprocess, argparse
 from datetime import datetime
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--prefix", help="Prefix to be added to the renamed file.", default="")
+args = parser.parse_args()
+
 cur_dir = os.getcwd()
-extensions = [ "jpg", "jpeg", "mov", "mp4", "m4v", "heic" ]
+extensions = [ "jpg", "jpeg", "png", "mov", "mp4", "m4v", "heic" ]
 destination_dir = os.path.join(cur_dir, "Renamed")
 if not os.path.exists(destination_dir):
     os.makedirs(destination_dir)
@@ -25,6 +29,9 @@ for obj in json.loads(lines):
         file_time = datetime.strptime(modify_date, "%Y:%m:%d %H:%M:%S")
         src_file = os.path.join(cur_dir, obj["SourceFile"])
         dst_name = file_time.strftime("%Y%m%d %H%M%S")
+        if args.prefix != "":
+            dst_name += " - " + args.prefix
+            
         dst_name += " - ." + obj["FileTypeExtension"]
         dst_file = os.path.join(destination_dir, dst_name)
 
