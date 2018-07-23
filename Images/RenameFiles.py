@@ -4,6 +4,7 @@ from datetime import datetime
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--prefix", help="Prefix to be added to the renamed file.", default="")
+parser.add_argument("--nosuffix", help="No preparation for suffix.", action='store_true', default=False)
 args = parser.parse_args()
 
 cur_dir = os.getcwd()
@@ -31,13 +32,16 @@ for obj in json.loads(lines):
         dst_name = file_time.strftime("%Y%m%d %H%M%S")
         if args.prefix != "":
             dst_name += " - " + args.prefix
-            
-        dst_name += " - ." + obj["FileTypeExtension"]
+
+        if not args.nosuffix:            
+            dst_name += " - "
+        dst_name += "." + obj["FileTypeExtension"]
+
         dst_file = os.path.join(destination_dir, dst_name)
 
         id = 0
         while os.path.exists(dst_file):
-            dst_file = os.path.join(destination_dir, dst_name.replace("-", "- {}".format(id)))
+            dst_file = os.path.join(destination_dir, dst_name.replace(" - .", "_{} - .".format(id)))
             id += 1
 
         print('Renaming {} to {}'.format(src_file, dst_file))
