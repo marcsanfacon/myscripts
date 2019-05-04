@@ -20,34 +20,37 @@ p = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, std
 lines, error = p.communicate()
 
 for obj in json.loads(lines):
-    if "FileTypeExtension" in obj and obj["FileTypeExtension"].lower() in extensions:
-        if "CreateDate" in obj:
-            modify_date = obj["CreateDate"]
-        else:
-            modify_date = obj["FileModifyDate"]
-                    
-        modify_date = modify_date[:modify_date.find("-")]
-        file_time = datetime.strptime(modify_date, "%Y:%m:%d %H:%M:%S")
-        src_file = os.path.join(cur_dir, obj["SourceFile"])
-        dst_name = file_time.strftime("%Y%m%d %H%M%S")
-        if args.prefix != "":
-            dst_name += " - " + args.prefix
+    try:
+        if "FileTypeExtension" in obj and obj["FileTypeExtension"].lower() in extensions:
+            if "CreateDate" in obj:
+                modify_date = obj["CreateDate"]
+            else:
+                modify_date = obj["FileModifyDate"]
+                        
+            modify_date = modify_date[:modify_date.find("-")]
+            file_time = datetime.strptime(modify_date, "%Y:%m:%d %H:%M:%S")
+            src_file = os.path.join(cur_dir, obj["SourceFile"])
+            dst_name = file_time.strftime("%Y%m%d %H%M%S")
+            if args.prefix != "":
+                dst_name += " - " + args.prefix
 
-        if not args.nosuffix:            
-            dst_name += " - "
-        dst_name += "." + obj["FileTypeExtension"]
+            if not args.nosuffix:            
+                dst_name += " - "
+            dst_name += "." + obj["FileTypeExtension"]
 
-        dst_file = os.path.join(destination_dir, dst_name)
+            dst_file = os.path.join(destination_dir, dst_name)
 
-        id = 0
-        while os.path.exists(dst_file):
-            dst_file = os.path.join(destination_dir, dst_name.replace(" - .", "_{} - .".format(id)))
-            id += 1
+            id = 0
+            while os.path.exists(dst_file):
+                dst_file = os.path.join(destination_dir, dst_name.replace(" - .", "_{} - .".format(id)))
+                id += 1
 
-        print('Renaming {} to {}'.format(src_file, dst_file))
-        os.rename(src_file, dst_file)
+            print('Renaming {} to {}'.format(src_file, dst_file))
+            os.rename(src_file, dst_file)
 
-        st = os.stat(dst_file)
-        atime = st[stat.ST_ATIME]
-        os.utime(dst_file, (atime, file_time.timestamp()))
+            st = os.stat(dst_file)
+            atime = st[stat.ST_ATIME]
+            os.utime(dst_file, (atime, file_time.timestamp()))
+    except Exception as e:
+        print(e)
         
